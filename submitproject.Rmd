@@ -1,0 +1,41 @@
+---
+title: "sumbit_Arka"
+author: "Arka"
+date: "March 12, 2016"
+output: html_document
+---
+
+```{r load_packages,message=FALSE,warning=FALSE}
+setwd("~/R")
+library(caret)
+library(MASS)
+library(rpart)
+data_train_1=read.csv("pml-training.csv",header = TRUE,sep = ",")
+data_test_1=read.csv("pml-testing.csv",header = TRUE,sep = ",")
+
+data_train=data_train_1[,c(7,8,9,10,11,37:49,60:68,84:86,102,113:124,140,151:160)]
+data_test=data_test_1[,c(7,8,9,10,11,37:49,60:68,84:86,102,113:124,140,151:159)]
+
+modFit=rpart(classe~.,data=data_train)
+pred = predict(modFit, type="class")
+tab=table(pred,data_train$classe)
+confusionMatrix(tab)
+predict(modFit, type="class",newdata=data_test)
+
+modFit=train(classe~.,method="rpart",data=data_train)
+print(modFit$finalModel)
+plot(modFit$finalModel,uniform=TRUE,main="Classify")
+text(modFit$finalModel,use.n=TRUE,all=TRUE,cex=.8)
+predict(modFit,newdata=data_test)
+
+
+modFit_lda=lda(classe~.,data=data_train)
+
+model <- predict(modFit_lda)$class
+conf=table(model,data_train$class)
+confusionMatrix(conf)
+
+predict(modFit_lda,newdata=data_test)
+
+
+```
